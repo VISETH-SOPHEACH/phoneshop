@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-50">
+  <div class=" bg-gray-50">
     <header
       class="flex items-center justify-between px-6 md:px-16 py-4 bg-white shadow-md sticky top-0 z-50"
     >

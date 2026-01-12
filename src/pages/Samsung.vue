@@ -1,84 +1,86 @@
 <template>
-  <div :class="{ dark: isDark }">
-    <div
-      class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300"
-    >
-      <nav
-        class="p-6 flex justify-between items-center border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 sticky top-0 z-10"
-      >
+  <div class="min-h-screen bg-gray-50">
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-10 bg-gray-50">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center">
         <h1
-          class="text-2xl font-bold tracking-tight text-blue-600 dark:text-blue-400"
+          class="text-3xl text-center font-extrabold tracking-tight text-blue-600 dark:text-blue-400"
         >
           Samsung <span class="text-gray-400 font-light">Store</span>
         </h1>
-      </nav>
+      </div>
+    </nav>
 
-      <main class="max-w-7xl mx-auto p-6">
+    <main class="max-w-7xl mx-auto px-6 py-14">
+      <!-- Loading -->
+      <div v-if="loading" class="flex flex-col items-center py-24">
         <div
-          v-if="loading"
-          class="flex flex-col items-center justify-center py-20"
+          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
+        ></div>
+        <p class="text-gray-500 text-lg">API កំពុងបែកវ៉ល់ហើយ កុំប្រញ៉ាប់ពេក...</p>
+      </div>
+
+      <!-- Error -->
+      <div v-else-if="error" class="text-center py-24">
+        <p class="text-red-500 text-xl font-semibold">{{ error }}</p>
+      </div>
+
+      <!-- Products -->
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+      >
+        <div
+          v-for="item in samsung"
+          :key="item.id"
+          class="group rounded-3xl bg-gray-50 backdrop-blur border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
+          <!-- Image -->
           <div
-            class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-          ></div>
-          <p class="mt-4 text-gray-500">កំពុងស្វែងរកផលិតផល...</p>
-        </div>
-
-        <div
-          v-else-if="error"
-          class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-        >
-          <strong class="font-bold">Error: </strong>
-          <span>{{ error }}</span>
-        </div>
-
-        <div
-          v-else
-          class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
-        >
-          <div
-            v-for="item in samsung"
-            :key="item.id"
-            class="group bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-300 border border-gray-100 dark:border-gray-700"
+            class="h-60 flex items-center justify-center bg-linaer-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900"
           >
-            <div class="h-48 overflow-hidden bg-gray-200">
-              <img
-                :src="item.thumbnail"
-                :alt="item.title"
-                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-            </div>
+            <img
+              :src="item.thumbnail"
+              :alt="item.title"
+              class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-110"
+            />
+          </div>
 
-            <div class="p-4">
-              <p
-                class="text-xs font-semibold text-blue-500 uppercase tracking-wider mb-1"
+          <!-- Content -->
+          <div class="p-6 flex flex-col grow">
+            <p
+              class="text-xs font-semibold text-blue-500 uppercase tracking-widest mb-1"
+            >
+              {{ item.brand }}
+            </p>
+
+            <h2
+              class="text-xl font-semibold text-gray-900  mb-2 line-clamp-1"
+            >
+              {{ item.title }}
+            </h2>
+
+            <p
+              class="text-sm text-gray-500 dark:text-gray-400 leading-relaxed mb-4 line-clamp-3"
+            >
+              {{ item.description }}
+            </p>
+
+            <div class="mt-auto flex items-center justify-between">
+              <span class="text-2xl font-bold text-gray-900 ">
+                ${{ item.price }}
+              </span>
+
+              <button
+                class="px-5 py-2.5 rounded-full bg-black text-white  text-sm font-semibold hover:opacity-80 transition"
               >
-                {{ item.brand }}
-              </p>
-              <h2 class="text-lg font-bold mb-2 line-clamp-1">
-                {{ item.title }}
-              </h2>
-              <p
-                class="text-sm text-gray-500 dark:text-gray-400 line-clamp-2 mb-4"
-              >
-                {{ item.description }}
-              </p>
-              <div class="flex items-center justify-between mt-auto">
-                <span
-                  class="text-xl font-bold text-green-600 dark:text-green-400"
-                  >${{ item.price }}</span
-                >
-                <button
-                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm transition-colors"
-                >
-                  Buy Now
-                </button>
-              </div>
+                Buy Now
+              </button>
             </div>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </main>
   </div>
 </template>
 
@@ -88,7 +90,6 @@ import { ref, onMounted } from "vue";
 const samsung = ref([]);
 const loading = ref(true);
 const error = ref(null);
-const isDark = ref(false);
 
 const fetchSamsung = async () => {
   try {
@@ -111,14 +112,3 @@ const fetchSamsung = async () => {
 
 onMounted(fetchSamsung);
 </script>
-
-<style scoped>
-.transition-colors {
-  transition-property: background-color, border-color, color, fill, stroke;
-}
-
-/* Enable dark mode classes */
-.dark {
-  color-scheme: dark;
-}
-</style>
