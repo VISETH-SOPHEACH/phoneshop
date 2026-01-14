@@ -1,23 +1,27 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
     <div class="max-w-7xl mx-auto px-6 py-14">
-
+      <!-- Header -->
       <header class="text-center mb-14">
-       
         <p v-if="pixels.length" class="text-gray-500 text-lg">
           {{ pixels.length }} models available
         </p>
       </header>
 
+      <!-- Loading -->
       <div v-if="loading" class="flex flex-col items-center py-20">
-        <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+        <div
+          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
+        ></div>
         <p class="text-gray-500 text-lg">Loading Google products…</p>
       </div>
 
+      <!-- Error -->
       <div v-else-if="error" class="text-center py-20">
         <p class="text-red-500 text-xl font-semibold">{{ error }}</p>
       </div>
 
+      <!-- Products Grid -->
       <div
         v-else
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
@@ -27,7 +31,9 @@
           :key="product.id"
           class="group rounded-3xl bg-white/70 backdrop-blur-lg border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
-          <div class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white">
+          <div
+            class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white"
+          >
             <img
               :src="product.thumbnail"
               :alt="product.title"
@@ -50,6 +56,7 @@
               </span>
 
               <button
+                @click="openDetails(product)"
                 class="px-5 py-2.5 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
               >
                 View Details
@@ -58,37 +65,87 @@
           </div>
         </div>
       </div>
+    </div>
 
+    <!-- Details Modal -->
+    <div
+      v-if="selectedProduct"
+      class="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+    >
+      <div class="bg-white rounded-3xl max-w-lg w-full p-8 shadow-2xl relative">
+        <button
+          @click="closeDetails"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
+        >
+          ✕
+        </button>
+
+        <h2 class="text-2xl font-bold text-gray-900 mb-3">
+          {{ selectedProduct.title }}
+        </h2>
+
+        <img
+          :src="selectedProduct.thumbnail"
+          class="w-full h-48 object-contain mb-4"
+        />
+
+        <p class="text-gray-600 leading-relaxed">
+          {{
+            exampleDescriptions[selectedProduct.id] ||
+            "This is a sample custom description written by me."
+          }}
+        </p>
+
+        <div class="mt-6 text-xl font-bold text-blue-600">
+          ${{ selectedProduct.price }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 
 const pixels = ref([]);
 const loading = ref(true);
 const error = ref(null);
+const selectedProduct = ref(null);
+
+/* YOUR OWN DESCRIPTION MAP */
+const exampleDescriptions = {
+  1: "This Google Pixel smartphone delivers a clean Android experience with excellent camera quality and long-term software support.",
+  2: "A stylish and affordable Pixel phone designed for daily use with strong battery life.",
+  3: "Built for photography lovers, featuring AI-enhanced night mode and portrait shots.",
+  4: "A premium Pixel device offering fast performance, security updates, and a smooth display.",
+};
 
 const fetchPixels = async () => {
   try {
     loading.value = true;
     const response = await fetch(
-      'https://dummyjson.com/products/category/smartphones'
+      "https://dummyjson.com/products/category/smartphones"
     );
 
-    if (!response.ok) throw new Error('Network response was not ok');
+    if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
 
     pixels.value = data.products;
   } catch (err) {
-    error.value = 'Failed to load products. Please check your connection.';
-    console.error('Fetch error:', err);
+    error.value = "Failed to load products. Please check your connection.";
+    console.error(err);
   } finally {
     loading.value = false;
   }
 };
 
+const openDetails = (product) => {
+  selectedProduct.value = product;
+};
+
+const closeDetails = () => {
+  selectedProduct.value = null;
+};
 
 onMounted(fetchPixels);
 </script>
