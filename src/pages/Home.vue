@@ -3,6 +3,7 @@
     <div class="max-w-7xl mx-auto px-6 py-14">
       <!-- Header -->
       <header class="text-center mb-14">
+        <h1 class="ml-auto justify-center text-center text-4xl text-purple-600">Home Pages</h1>
         <p v-if="pixels.length" class="text-gray-500 text-lg">
           {{ pixels.length }} models available
         </p>
@@ -90,10 +91,7 @@
         />
 
         <p class="text-gray-600 leading-relaxed">
-          {{
-            exampleDescriptions[selectedProduct.id] ||
-            "This is a sample custom description written by me."
-          }}
+          {{ getDescription(selectedProduct) }}
         </p>
 
         <div class="mt-6 text-xl font-bold text-blue-600">
@@ -112,24 +110,23 @@ const loading = ref(true);
 const error = ref(null);
 const selectedProduct = ref(null);
 
-/* YOUR OWN DESCRIPTION MAP */
-const exampleDescriptions = {
-  1: "This Google Pixel smartphone delivers a clean Android experience with excellent camera quality and long-term software support.",
-  2: "A stylish and affordable Pixel phone designed for daily use with strong battery life.",
-  3: "Built for photography lovers, featuring AI-enhanced night mode and portrait shots.",
-  4: "A premium Pixel device offering fast performance, security updates, and a smooth display.",
+/* CUSTOM DESCRIPTIONS */
+const customDescriptions = {
+  "iPhone 9": "This Google Pixel smartphone delivers a clean Android experience with excellent camera quality and long-term software support.",
+  "iPhone X": "A stylish and affordable Pixel phone designed for daily use with strong battery life.",
+  "Samsung Universe 9": "Built for photography lovers, featuring AI-enhanced night mode and portrait shots.",
+  "OPPOF19": "A premium Pixel device offering fast performance, security updates, and a smooth display.",
 };
 
+/* Fetch products from DummyJSON */
 const fetchPixels = async () => {
   try {
     loading.value = true;
     const response = await fetch(
       "https://dummyjson.com/products/category/smartphones"
     );
-
     if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
-
     pixels.value = data.products;
   } catch (err) {
     error.value = "Failed to load products. Please check your connection.";
@@ -139,12 +136,17 @@ const fetchPixels = async () => {
   }
 };
 
+/* Open/close modal */
 const openDetails = (product) => {
   selectedProduct.value = product;
 };
-
 const closeDetails = () => {
   selectedProduct.value = null;
+};
+
+/* Get description for modal */
+const getDescription = (product) => {
+  return customDescriptions[product.title] || "This is a sample custom description written by me.";
 };
 
 onMounted(fetchPixels);

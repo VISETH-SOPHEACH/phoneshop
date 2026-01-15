@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6 py-14">
+    <div class="max-w-7xl mx-auto px-6">
       <!-- Header -->
       <nav class="sticky top-0 z-10 bg-gray-50">
         <div
