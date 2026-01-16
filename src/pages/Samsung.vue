@@ -185,7 +185,7 @@ const fetchSamsung = async () => {
     const data = await response.json();
     samsung.value = data.products;
   } catch (err) {
-    error.value = "បរាជ័យក្នុងការទាញយកទិន្នន័យ";
+    error.value = "API បែកង៉ាងើយ វីវរហើយ";
   } finally {
     loading.value = false;
   }
