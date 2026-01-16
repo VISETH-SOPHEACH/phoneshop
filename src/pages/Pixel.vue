@@ -1,7 +1,6 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
     <div class="max-w-7xl mx-auto px-6 py-14">
-
       <header class="text-center mb-14">
         <h1 class="text-5xl font-extrabold tracking-tight text-gray-900 mb-3">
           Google Pixel Collection
@@ -12,7 +11,9 @@
       </header>
 
       <div v-if="loading" class="flex flex-col items-center py-20">
-        <div class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"></div>
+        <div
+          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
+        ></div>
         <p class="text-gray-500 text-lg">Loading Google products…</p>
       </div>
 
@@ -29,7 +30,9 @@
           :key="product.id"
           class="group rounded-3xl bg-white/70 backdrop-blur-lg border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
-          <div class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white">
+          <div
+            class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white"
+          >
             <img
               :src="product.thumbnail"
               :alt="product.title"
@@ -41,17 +44,15 @@
             <h3 class="text-xl font-semibold text-gray-900 mb-2">
               {{ product.title }}
             </h3>
-
             <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">
               {{ product.description }}
             </p>
-
             <div class="mt-auto flex items-center justify-between">
-              <span class="text-2xl font-bold text-gray-900">
-                ${{ product.price }}
-              </span>
-
+              <span class="text-2xl font-bold text-gray-900"
+                >${{ product.price }}</span
+              >
               <button
+                @click="openDetails(product)"
                 class="px-5 py-2.5 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
               >
                 View Details
@@ -61,36 +62,161 @@
         </div>
       </div>
 
+      <div
+        v-if="selectedProduct"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      >
+        <div
+          class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative animate-in zoom-in duration-200"
+        >
+          <button
+            @click="closeModal"
+            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl z-10"
+          >
+            &times;
+          </button>
+
+          <div v-if="modalStep === 'details'" class="p-8">
+            <div class="flex flex-col items-center">
+              <img
+                :src="selectedProduct.thumbnail"
+                class="h-48 object-contain mb-6"
+              />
+              <h2 class="text-3xl font-bold text-gray-900 mb-2">
+                {{ selectedProduct.title }}
+              </h2>
+              <p class="text-blue-600 text-2xl font-bold mb-4">
+                ${{ selectedProduct.price }}
+              </p>
+              <div class="text-gray-600 space-y-2 text-center mb-8">
+                <p><strong>Brand:</strong> {{ selectedProduct.brand }}</p>
+                <p><strong>Category:</strong> {{ selectedProduct.category }}</p>
+                <p>{{ selectedProduct.description }}</p>
+              </div>
+              <button
+                @click="modalStep = 'form'"
+                class="w-full py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-colors shadow-lg"
+              >
+                Buy This Phone
+              </button>
+            </div>
+          </div>
+
+          <div v-else-if="modalStep === 'form'" class="p-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">
+              Complete Your Order
+            </h2>
+            <form @submit.prevent="submitOrder" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Delivery Location</label
+                >
+                <input
+                  v-model="orderForm.location"
+                  required
+                  type="text"
+                  placeholder="Street address, City"
+                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Phone Number</label
+                >
+                <input
+                  v-model="orderForm.phone"
+                  required
+                  type="tel"
+                  placeholder="+1 (555) 000-0000"
+                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700"
+                  >Feedback / Notes</label
+                >
+                <textarea
+                  v-model="orderForm.feedback"
+                  rows="3"
+                  placeholder="Any special instructions?"
+                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                ></textarea>
+              </div>
+
+              <div class="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  @click="modalStep = 'details'"
+                  class="flex-1 py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  class="flex-2 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-lg"
+                >
+                  Confirm Purchase
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, reactive } from "vue";
 
 const pixels = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
+// Modal State
+const selectedProduct = ref(null);
+const modalStep = ref("details");
+const orderForm = reactive({
+  location: "",
+  phone: "",
+  feedback: "",
+});
+
 const fetchPixels = async () => {
   try {
     loading.value = true;
     const response = await fetch(
-      'https://dummyjson.com/products/category/smartphones'
+      "https://dummyjson.com/products/category/smartphones"
     );
-
-    if (!response.ok) throw new Error('Network response was not ok');
+    if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
-
     pixels.value = data.products;
   } catch (err) {
-    error.value = 'Failed to load products. Please check your connection.';
-    console.error('Fetch error:', err);
+    error.value = "Failed to load products. Please check your connection.";
   } finally {
     loading.value = false;
   }
 };
 
+const openDetails = (product) => {
+  selectedProduct.value = product;
+  modalStep.value = "details";
+};
+
+const closeModal = () => {
+  selectedProduct.value = null;
+  // Reset form
+  orderForm.location = "";
+  orderForm.phone = "";
+  orderForm.feedback = "";
+};
+
+const submitOrder = () => {
+  alert(
+    `Order Confirmed for ${selectedProduct.value.title}!\nDelivering to: ${orderForm.location}`
+  );
+  closeModal();
+};
 
 onMounted(fetchPixels);
 </script>

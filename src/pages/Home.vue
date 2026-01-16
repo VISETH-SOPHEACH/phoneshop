@@ -3,7 +3,9 @@
     <div class="max-w-7xl mx-auto px-6 py-14">
       <!-- Header -->
       <header class="text-center mb-14">
-        <h1 class="ml-auto justify-center text-center text-4xl text-purple-600">Home Pages</h1>
+        <h1 class="ml-auto justify-center text-center text-4xl text-purple-600">
+          Home Pages
+        </h1>
         <p v-if="pixels.length" class="text-gray-500 text-lg">
           {{ pixels.length }} models available
         </p>
@@ -112,10 +114,14 @@ const selectedProduct = ref(null);
 
 /* CUSTOM DESCRIPTIONS */
 const customDescriptions = {
-  "iPhone 9": "This Google Pixel smartphone delivers a clean Android experience with excellent camera quality and long-term software support.",
-  "iPhone X": "A stylish and affordable Pixel phone designed for daily use with strong battery life.",
-  "Samsung Universe 9": "Built for photography lovers, featuring AI-enhanced night mode and portrait shots.",
-  "OPPOF19": "A premium Pixel device offering fast performance, security updates, and a smooth display.",
+  "iPhone 9":
+    "This Google Pixel smartphone delivers a clean Android experience with excellent camera quality and long-term software support.",
+  "iPhone X":
+    "A stylish and affordable Pixel phone designed for daily use with strong battery life.",
+  "Samsung Universe 9":
+    "Built for photography lovers, featuring AI-enhanced night mode and portrait shots.",
+  OPPOF19:
+    "A premium Pixel device offering fast performance, security updates, and a smooth display.",
 };
 
 /* Fetch products from DummyJSON */
@@ -146,7 +152,10 @@ const closeDetails = () => {
 
 /* Get description for modal */
 const getDescription = (product) => {
-  return customDescriptions[product.title] || "This is a sample custom description written by me.";
+  return (
+    customDescriptions[product.title] ||
+    "This is a sample custom description written by meee, ឡុយអត់ ?."
+  );
 };
 
 onMounted(fetchPixels);

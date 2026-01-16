@@ -1,127 +1,112 @@
 <template>
-  <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6">
-      <!-- Header -->
-      <nav class="sticky top-0 z-10 bg-gray-50">
-        <div
-          class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center"
+  <div class="min-h-screen bg-gray-50 font-sans antialiased text-gray-900">
+    <nav
+      class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+      >
+        <h1 class="text-xl font-bold tracking-tight text-blue-600">iPhone</h1>
+        <p
+          v-if="!loading && iphones.length"
+          class="text-xs font-bold text-gray-400 uppercase tracking-widest"
         >
-          <h1
-            class="text-3xl text-center font-extrabold tracking-tight text-blue-600 dark:text-blue-400"
-          >
-            iPhone
-          </h1>
-        </div>
-      </nav>
+          {{ iphones.length }} Models
+        </p>
+      </div>
+    </nav>
 
-      <!-- Products Count -->
-      <p v-if="iphones.length" class="ml-[44%] mb-3 text-gray-500 text-lg">
-        {{ iphones.length }} models available
-      </p>
-
-      <!-- Loading -->
-      <div v-if="loading" class="flex flex-col items-center py-20">
+    <main class="max-w-7xl mx-auto px-4 py-6">
+      <div
+        v-if="loading"
+        class="flex flex-col items-center justify-center py-20"
+      >
         <div
-          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
+          class="w-10 h-10 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-4"
         ></div>
-        <p class="text-gray-500 text-lg">Loading Apple products…</p>
       </div>
 
-      <!-- Error -->
-      <div v-else-if="error" class="text-center py-20">
-        <p class="text-red-500 text-xl font-semibold">{{ error }}</p>
+      <div v-else-if="error" class="text-center py-10">
+        <p class="text-red-500 font-medium">{{ error }}</p>
       </div>
 
-      <!-- Products Grid -->
       <div
         v-else
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+        class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8"
       >
         <div
           v-for="product in iphones"
           :key="product.id"
-          class="group rounded-3xl bg-white/70 backdrop-blur-lg border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col relative"
+          class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden"
         >
-          <!-- Image -->
           <div
-            class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white"
+            class="aspect-square flex items-center justify-center bg-gray-50 p-4"
           >
             <img
               :src="product.thumbnail"
               :alt="product.title"
-              class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-110"
+              class="max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
             />
           </div>
 
-          <!-- Content -->
-          <div class="p-6 flex flex-col grow">
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
+          <div class="p-4 flex flex-col grow">
+            <h3 class="text-sm md:text-lg font-bold line-clamp-1 mb-1">
               {{ product.title }}
             </h3>
-
-            <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">
+            <p class="text-xs text-gray-500 line-clamp-2 mb-4 hidden sm:block">
               {{ product.description }}
             </p>
 
-            <div class="mt-auto flex items-center justify-between">
-              <span class="text-2xl font-bold text-gray-900">
-                ${{ product.price }}
-              </span>
-
+            <div class="mt-auto flex flex-col gap-2">
+              <span class="text-lg font-black">${{ product.price }}</span>
               <button
                 @click="openDetails(product)"
-                class="px-5 py-2.5 rounded-full bg-black text-white text-sm font-semibold hover:bg-gray-800 transition"
+                class="w-full py-2 rounded-xl bg-gray-900 text-white text-xs font-bold hover:bg-blue-600 transition-colors"
               >
-                View Details
+                Details
               </button>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
-    <!-- Details Modal -->
     <div
       v-if="selectedProduct"
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
+      @click.self="closeDetails"
     >
       <div
-        class="bg-white rounded-3xl max-w-lg w-full p-6 relative shadow-2xl"
+        class="bg-white rounded-4xl max-w-sm w-full p-6 relative shadow-2xl animate-in zoom-in duration-200"
       >
-        <!-- Close Button -->
         <button
           @click="closeDetails"
-          class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-xl"
+          class="absolute top-4 right-4 text-gray-400"
         >
           ✕
         </button>
-
-        <!-- Image -->
-        <div class="flex justify-center mb-4">
-          <img
-            :src="selectedProduct.thumbnail"
-            :alt="selectedProduct.title"
-            class="h-56 object-contain"
-          />
-        </div>
-
-        <!-- Info -->
-        <h2 class="text-2xl font-bold mb-2">
-          {{ selectedProduct.title }}
-        </h2>
-
-        <p class="text-gray-600 mb-4">
+        <img
+          :src="selectedProduct.thumbnail"
+          class="h-40 mx-auto mb-4 object-contain"
+        />
+        <h2 class="text-xl font-bold mb-2">{{ selectedProduct.title }}</h2>
+        <p class="text-sm text-gray-600 mb-6">
           {{ selectedProduct.description }}
         </p>
-
-        <div class="flex justify-between items-center">
-          <span class="text-2xl font-bold">
-            ${{ selectedProduct.price }}
-          </span>
-
-          <span class="text-sm text-gray-500">
-            Rating: ⭐ {{ selectedProduct.rating }}
-          </span>
+        <div class="flex justify-between items-center border-t pt-4">
+          <span class="text-2xl font-black">${{ selectedProduct.price }}</span>
+          <div class="flex gap-x-3">
+            <button
+              class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm"
+            >
+              Buy
+            </button>
+            <button
+              class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm"
+            >
+              Add
+            </button>
+          </div>
         </div>
       </div>
     </div>
