@@ -16,13 +16,26 @@
         >
           <router-link
             :to="brand.path"
-            class="text-sm font-semibold text-gray-700 transition-all duration-300 group-hover:text-blue-600"
+            v-slot="{ isActive }"
+            class="text-sm font-semibold transition-all duration-300"
           >
-            {{ brand.name }}
+            <span
+              :class="
+                isActive
+                  ? 'text-blue-600'
+                  : 'text-gray-700 group-hover:text-blue-600'
+              "
+            >
+              {{ brand.name }}
+            </span>
+
+            <span
+              :class="[
+                'absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300',
+                isActive ? 'w-full' : 'w-0 group-hover:w-full',
+              ]"
+            ></span>
           </router-link>
-          <span
-            class="absolute -bottom-1 left-0 w-0 h-0.5 bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300 group-hover:w-full"
-          ></span>
         </div>
       </nav>
 
@@ -139,10 +152,20 @@
             v-for="(brand, index) in brands"
             :key="index"
             :to="brand.path"
+            v-slot="{ isActive }"
             @click="isMenuOpen = false"
+            active-class="text-blue-600"
             class="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors"
           >
-            {{ brand.name }}
+            <span
+              :class="
+                isActive
+                  ? 'text-red-600'
+                  : 'text-gray-700 group-hover:text-blue-600'
+              "
+            >
+              {{ brand.name }}
+            </span>
           </router-link>
           <div class="pt-4 border-t border-gray-200/50">
             <button
@@ -166,14 +189,14 @@ export default {
   data() {
     return {
       isMenuOpen: false,
-      showAuthModal: false, // Controls visibility of the pop-up
-      isLoginView: true, // Toggles between Login and Register
+      showAuthModal: false,
+      isLoginView: true,
       brands: [
         { name: "Home", path: "/" },
         { name: "iPhone", path: "/iphone" },
         { name: "Samsung", path: "/samsung" },
         { name: "Google Pixel", path: "/pixel" },
-        { name: "Nokia", path: "/nokia" },
+        { name: "Accesury", path: "/accesury" },
       ],
     };
   },

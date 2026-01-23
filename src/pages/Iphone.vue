@@ -4,12 +4,12 @@
       class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200"
     >
       <div
-        class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center"
+        class=" max-w-7xl mx-auto px-4 py-4 flex-col justify-center items-center"
       >
-        <h1 class="text-xl font-bold tracking-tight text-blue-600">iPhone</h1>
+        <h1 class="text-3xl text-center font-bold tracking-tight text-blue-600">Apple Store</h1>
         <p
           v-if="!loading && iphones.length"
-          class="text-xs font-bold text-gray-400 uppercase tracking-widest"
+          class="text-center pt-2 text-xs font-bold text-gray-400 uppercase tracking-widest"
         >
           {{ iphones.length }} Models
         </p>

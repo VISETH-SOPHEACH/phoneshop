@@ -1,22 +1,28 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6 py-14">
-      <!-- Header -->
-      <header class="text-center mb-14">
-        <h1 class="ml-auto justify-center text-center text-4xl text-purple-600">
-          Home Pages
-        </h1>
-        <p v-if="pixels.length" class="text-gray-500 text-lg">
+    <div class="max-w-7xl mx-auto px-6 py-1">
+      <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md">
+        <div
+          class="max-w-7xl mx-auto py-3 flex justify-center items-center"
+        >
+          <h1
+            class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
+          >
+            Home <span class="text-gray-400 font-light">PAge</span>
+          </h1>
+        </div>
+
+        <p v-if="pixels.length" class="text-center pb-2.5 text-gray-500 text-lg">
           {{ pixels.length }} models available
         </p>
-      </header>
+      </nav>
 
       <!-- Loading -->
       <div v-if="loading" class="flex flex-col items-center py-20">
         <div
           class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
         ></div>
-        <p class="text-gray-500 text-lg">Loading Google products…</p>
+        <p class="text-gray-500 text-lg">Loading home page .... សូមរង់ចាំ</p>
       </div>
 
       <!-- Error -->
@@ -102,10 +108,18 @@
       </div>
     </div>
   </div>
+  <Iphone />
+  <Pixel />
+  <Samsung />
+  <Accesury />
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
+import Iphone from "./Iphone.vue";
+import Pixel from "./Pixel.vue";
+import Samsung from "./Samsung.vue";
+import Accesury from "./Accesury.vue";
 
 const pixels = ref([]);
 const loading = ref(true);
@@ -125,11 +139,11 @@ const customDescriptions = {
 };
 
 /* Fetch products from DummyJSON */
-const fetchPixels = async () => {
+const fetchHome = async () => {
   try {
     loading.value = true;
     const response = await fetch(
-      "https://dummyjson.com/products/category/smartphones"
+      "https://dummyjson.com/products/category/smartphones",
     );
     if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
@@ -154,9 +168,9 @@ const closeDetails = () => {
 const getDescription = (product) => {
   return (
     customDescriptions[product.title] ||
-    "This is a sample custom description written by meee, ឡុយអត់ ?."
+    "This is a sample custom description written by meee, ឡូយអត់ ?."
   );
 };
 
-onMounted(fetchPixels);
+onMounted(fetchHome);
 </script>

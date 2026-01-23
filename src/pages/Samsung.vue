@@ -15,7 +15,7 @@
         <div
           class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
         ></div>
-        <p class="text-gray-500 text-lg">កំពុងទាញយកទិន្នន័យ...</p>
+        <p class="text-gray-500 text-lg">កំពុងទាញយកទិន្នន័យ...ពី API សូមរង់ចាំបន្តិច</p>
       </div>
 
       <div v-else-if="error" class="text-center py-24">

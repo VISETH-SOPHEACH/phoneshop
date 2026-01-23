@@ -1,20 +1,26 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6 py-14">
-      <header class="text-center mb-14">
-        <h1 class="text-5xl font-extrabold tracking-tight text-gray-900 mb-3">
-          Google Pixel Collection
-        </h1>
+    <div class="max-w-7xl mx-auto px-6 ">
+      <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md">
+        <div
+          class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center"
+        >
+          <h1
+            class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
+          >
+            Second <span class="text-gray-400 font-light">Hand</span>
+          </h1>
+        </div>
         <p v-if="pixels.length" class="text-gray-500 text-lg">
           {{ pixels.length }} models available
         </p>
-      </header>
+      </nav>
 
       <div v-if="loading" class="flex flex-col items-center py-20">
         <div
           class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
         ></div>
-        <p class="text-gray-500 text-lg">Loading Google products…</p>
+        <p class="text-gray-500 text-lg">ទាញយកទិន្នន័យពី API</p>
       </div>
 
       <div v-else-if="error" class="text-center py-20">
@@ -186,7 +192,7 @@ const fetchPixels = async () => {
   try {
     loading.value = true;
     const response = await fetch(
-      "https://dummyjson.com/products/category/smartphones"
+      "https://dummyjson.com/products/category/smartphones",
     );
     if (!response.ok) throw new Error("Network response was not ok");
     const data = await response.json();
@@ -213,7 +219,7 @@ const closeModal = () => {
 
 const submitOrder = () => {
   alert(
-    `Order Confirmed for ${selectedProduct.value.title}!\nDelivering to: ${orderForm.location}`
+    `Order Confirmed for ${selectedProduct.value.title}!\nDelivering to: ${orderForm.location}`,
   );
   closeModal();
 };
