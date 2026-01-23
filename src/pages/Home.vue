@@ -8,7 +8,7 @@
           <h1
             class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
           >
-            Home <span class="text-gray-400 font-light">PAge</span>
+            Home <span class="text-gray-400 font-light">Page</span>
           </h1>
         </div>
 
