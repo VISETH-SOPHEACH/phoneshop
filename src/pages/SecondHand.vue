@@ -1,19 +1,22 @@
 <template>
   <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6 ">
+    <div class="max-w-7xl mx-auto px-6">
       <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md">
         <div
-          class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center"
+          class="max-w-7xl mx-auto px-6 py-5 flex flex-col justify-center items-center"
         >
           <h1
             class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
           >
             Second <span class="text-gray-400 font-light">Hand</span>
           </h1>
+          <p
+            v-if="!loading && filteredPixels.length"
+            class="text-gray-500 text-lg pt-2"
+          >
+            {{ filteredPixels.length }} models available
+          </p>
         </div>
-        <p v-if="pixels.length" class="text-gray-500 text-lg">
-          {{ pixels.length }} models available
-        </p>
       </nav>
 
       <div v-if="loading" class="flex flex-col items-center py-20">
@@ -28,11 +31,11 @@
       </div>
 
       <div
-        v-else
+        v-else-if="filteredPixels.length > 0"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
       >
         <div
-          v-for="product in pixels"
+          v-for="product in filteredPixels"
           :key="product.id"
           class="group rounded-3xl bg-white/70 backdrop-blur-lg border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
@@ -68,9 +71,18 @@
         </div>
       </div>
 
+      <div v-else class="text-center py-20">
+        <div class="text-4xl mb-4">🔎</div>
+        <h3 class="text-lg font-bold text-gray-800">រកមិនឃើញទិន្នន័យទេ</h3>
+        <p class="text-gray-500">
+          No second hand phones match "{{ searchQuery }}"
+        </p>
+      </div>
+
       <div
         v-if="selectedProduct"
         class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        @click.self="closeModal"
       >
         <div
           class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative animate-in zoom-in duration-200"
@@ -173,13 +185,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed, defineProps } from "vue";
+
+// accept the search query prop
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: "",
+  },
+});
 
 const pixels = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
-// Modal State
+// modal State
 const selectedProduct = ref(null);
 const modalStep = ref("details");
 const orderForm = reactive({
@@ -188,7 +208,19 @@ const orderForm = reactive({
   feedback: "",
 });
 
-const fetchPixels = async () => {
+// filter logic for the list
+const filteredPixels = computed(() => {
+  if (!props.searchQuery) return pixels.value;
+  const query = props.searchQuery.toLowerCase().trim();
+  return pixels.value.filter((product) => {
+    return (
+      product.title.toLowerCase().includes(query) ||
+      product.description.toLowerCase().includes(query)
+    );
+  });
+});
+
+const fetchSecond = async () => {
   try {
     loading.value = true;
     const response = await fetch(
@@ -211,7 +243,6 @@ const openDetails = (product) => {
 
 const closeModal = () => {
   selectedProduct.value = null;
-  // Reset form
   orderForm.location = "";
   orderForm.phone = "";
   orderForm.feedback = "";
@@ -224,5 +255,5 @@ const submitOrder = () => {
   closeModal();
 };
 
-onMounted(fetchPixels);
+onMounted(fetchSecond);
 </script>

@@ -1,17 +1,20 @@
 <template>
-	<Navbar />
-	<router-view />
-	<Footer />
+  <Navbar @search-product="updateSearch" />
+  
+  <router-view :searchQuery="searchString" />
+  
+  <Footer />
 </template>
 
-<script>
+<script setup>
+import { ref } from 'vue';
 import Navbar from './components/Navbar.vue';
-import Footer from './components/Footer.vue'
+import Footer from './components/Footer.vue';
 
-export default {
-	components: {
-		Navbar,
-		Footer
-	}
-}
+// This variable holds the text typed in the Navbar
+const searchString = ref("");
+
+const updateSearch = (text) => {
+  searchString.value = text;
+};
 </script>

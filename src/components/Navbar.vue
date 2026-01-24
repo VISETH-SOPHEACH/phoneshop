@@ -39,6 +39,63 @@
         </div>
       </nav>
 
+      <div class="relative">
+        <button
+          @click="toggleMobileSearch"
+          class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur hover:bg-white/80 transition shadow-sm"
+        >
+          🔍
+        </button>
+
+        <div class="hidden md:flex items-center relative">
+          <input
+            v-model="searchText" @input="search" type="text" placeholder="Search products..."
+            class="w-64 pl-10 pr-4 py-2 text-sm rounded-full border bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <span class="absolute left-3 text-gray-400">🔍</span>
+        </div>
+
+        <transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="opacity-0 translate-y-[-20px]"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 translate-y-[-20px]"
+        >
+          <div
+            v-if="isSearchOpen"
+            class="fixed inset-0 z-100 bg-white/95 backdrop-blur-md flex flex-col px-4 pt-6"
+          >
+            <div class="flex items-center gap-3">
+              <div class="relative flex-1">
+                <span
+                  class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                  >🔍</span
+                >
+                <input
+                  v-model="searchText" @input="search" type="text" placeholder="Search products..." class="w-full pl-11 pr-4 py-3 text-base rounded-2xl border-none bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-inner" autofocus
+                />
+              </div>
+
+              <button
+                @click="handleMobileSearch"
+                class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md active:bg-blue-700 transition"
+              >
+                Search
+              </button>
+            </div>
+
+            <div
+              v-if="searchText"
+              class="mt-4 px-2 text-sm text-gray-500 italic"
+            >
+              Showing results for: "{{ searchText }}"
+            </div>
+          </div>
+        </transition>
+      </div>
+
       <div class="flex items-center gap-3">
         <button
           @click="showAuthModal = true"
@@ -188,19 +245,30 @@
 export default {
   data() {
     return {
+      searchText: "",
       isMenuOpen: false,
+      isSearchOpen: false,
       showAuthModal: false,
       isLoginView: true,
       brands: [
         { name: "Home", path: "/" },
         { name: "iPhone", path: "/iphone" },
         { name: "Samsung", path: "/samsung" },
-        { name: "Google Pixel", path: "/pixel" },
+        { name: "Second Hand", path: "/secondHand" },
         { name: "Accesury", path: "/accesury" },
       ],
     };
   },
   methods: {
+    toggleMobileSearch() {
+      this.isSearchOpen = !this.isSearchOpen;
+      if (this.isSearchOpen) {
+        this.isMenuOpen = false;
+      }
+    },
+    search() {
+      this.$emit("search-product", this.searchText);
+    },
     handleSubmit() {
       const mode = this.isLoginView ? "Logging in" : "Registering";
       alert(`${mode}... (This is where your API call goes)`);

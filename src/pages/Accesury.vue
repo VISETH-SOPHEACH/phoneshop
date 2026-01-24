@@ -1,12 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <nav class="sticky top-0 z-10 bg-gray-50 border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center">
+    <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md border-b border-gray-200">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col justify-center items-center">
         <h1
           class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
         >
-          Nokia <span class="text-gray-400 font-light">Page</span>
+          Accesury <span class="text-gray-400 font-light">Store</span>
         </h1>
+        <p v-if="!loading && filteredSamsung.length" class="text-center pt-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
+          {{ filteredSamsung.length }} Items Found
+        </p>
       </div>
     </nav>
 
@@ -25,11 +28,11 @@
       </div>
 
       <div
-        v-else
+        v-else-if="filteredSamsung.length > 0"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
       >
         <div
-          v-for="item in samsung"
+          v-for="item in filteredSamsung"
           :key="item.id"
           class="group rounded-3xl bg-white border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
@@ -68,11 +71,18 @@
           </div>
         </div>
       </div>
+
+      <div v-else class="text-center py-20">
+        <div class="text-4xl mb-4">📦</div>
+        <h3 class="text-lg font-bold text-gray-800">រកមិនឃើញគ្រឿងបន្លាស់ទេ</h3>
+        <p class="text-gray-500">No accessories match "{{ searchQuery }}"</p>
+      </div>
     </main>
 
     <div
       v-if="selectedProduct"
       class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      @click.self="selectedProduct = null"
     >
       <div
         class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200"
@@ -103,9 +113,7 @@
 
           <form @submit.prevent="handlePurchase" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700"
-                >Location</label
-              >
+              <label class="block text-sm font-medium text-gray-700">Location</label>
               <input
                 v-model="form.location"
                 required
@@ -116,9 +124,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700"
-                >Phone Number</label
-              >
+              <label class="block text-sm font-medium text-gray-700">Phone Number</label>
               <input
                 v-model="form.phone"
                 required
@@ -129,9 +135,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700"
-                >Feedback</label
-              >
+              <label class="block text-sm font-medium text-gray-700">Feedback</label>
               <textarea
                 v-model="form.feedback"
                 rows="3"
@@ -154,7 +158,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed, defineProps } from "vue";
+
+// Accept searchQuery from parent
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: ""
+  }
+});
 
 const samsung = ref([]);
 const loading = ref(true);
@@ -166,6 +178,17 @@ const form = reactive({
   location: "",
   phone: "",
   feedback: "",
+});
+  //filter products by name or description
+const filteredSamsung = computed(() => {
+  if (!props.searchQuery) return samsung.value;
+  const query = props.searchQuery.toLowerCase().trim();
+  return samsung.value.filter((item) => {
+    return (
+      item.title.toLowerCase().includes(query) ||
+      item.description.toLowerCase().includes(query)
+    );
+  });
 });
 
 const fetchSamsung = async () => {
@@ -185,7 +208,6 @@ const fetchSamsung = async () => {
 };
 
 const handlePurchase = () => {
-  // logic to send data to your backend
   alert(
     `អរគុណច្រើន! Order for ${selectedProduct.value.title} is placed.\nLocation: ${form.location}`
   );

@@ -1,12 +1,15 @@
 <template>
   <div class="min-h-screen bg-gray-50">
-    <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md">
-      <div class="max-w-7xl mx-auto px-6 py-5 flex justify-center items-center">
+    <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col justify-center items-center">
         <h1
           class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
         >
           Samsung <span class="text-gray-400 font-light">Store</span>
         </h1>
+        <p v-if="!loading && filteredSamsung.length" class="text-center pt-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
+          {{ filteredSamsung.length }} Models Found
+        </p>
       </div>
     </nav>
 
@@ -23,11 +26,11 @@
       </div>
 
       <div
-        v-else
+        v-else-if="filteredSamsung.length > 0"
         class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
       >
         <div
-          v-for="item in samsung"
+          v-for="item in filteredSamsung"
           :key="item.id"
           class="group rounded-3xl bg-white border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
         >
@@ -66,6 +69,12 @@
           </div>
         </div>
       </div>
+
+      <div v-else class="text-center py-20">
+        <div class="text-4xl mb-4">🔍</div>
+        <h3 class="text-lg font-bold text-gray-800">រកមិនឃើញទិន្នន័យទេ</h3>
+        <p class="text-gray-500">No Samsung products match "{{ searchQuery }}"</p>
+      </div>
     </main>
 
     <div
@@ -82,73 +91,29 @@
               @click="showModal = false"
               class="text-gray-400 hover:text-gray-600"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
           <p class="text-sm text-gray-600 mb-6">
             You are purchasing:
-            <span class="font-semibold text-blue-600">{{
-              selectedProduct?.title
-            }}</span>
+            <span class="font-semibold text-blue-600">{{ selectedProduct?.title }}</span>
           </p>
 
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Phone Number</label
-              >
-              <input
-                v-model="formData.phone"
-                type="tel"
-                required
-                placeholder="012 345 678"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+              <input v-model="formData.phone" type="tel" required placeholder="012 345 678" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none" />
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Delivery Location</label
-              >
-              <input
-                v-model="formData.location"
-                type="text"
-                required
-                placeholder="Street, City, Province"
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              />
+              <label class="block text-sm font-medium text-gray-700 mb-1">Delivery Location</label>
+              <input v-model="formData.location" type="text" required placeholder="Street, City, Province" class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none" />
             </div>
 
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Feedback/Note (Optional)</label
-              >
-              <textarea
-                v-model="formData.feedback"
-                rows="3"
-                placeholder="Any special instructions..."
-                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition resize-none"
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-lg shadow-blue-200"
-            >
+            <button type="submit" class="w-full py-4 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-lg">
               Confirm Order
             </button>
           </form>
@@ -159,14 +124,19 @@
 </template>
 
 <script setup>
-import { ref, onMounted, reactive } from "vue";
+import { ref, onMounted, reactive, computed, defineProps } from "vue";
 
-// State
+// receive the search query prop from App.vue or Home.vue
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: ""
+  }
+});
+
 const samsung = ref([]);
 const loading = ref(true);
 const error = ref(null);
-
-// Modal & Form State
 const showModal = ref(false);
 const selectedProduct = ref(null);
 const formData = reactive({
@@ -175,12 +145,22 @@ const formData = reactive({
   feedback: "",
 });
 
+// computed property for real-time filtering
+const filteredSamsung = computed(() => {
+  if (!props.searchQuery) return samsung.value;
+  const query = props.searchQuery.toLowerCase().trim();
+  return samsung.value.filter((item) => {
+    return (
+      item.title.toLowerCase().includes(query) ||
+      item.description.toLowerCase().includes(query)
+    );
+  });
+});
+
 const fetchSamsung = async () => {
   try {
     loading.value = true;
-    const response = await fetch(
-      "https://dummyjson.com/products/search?q=samsung"
-    );
+    const response = await fetch("https://dummyjson.com/products/search?q=samsung");
     if (!response.ok) throw new Error("API Error");
     const data = await response.json();
     samsung.value = data.products;
@@ -197,11 +177,7 @@ const openModal = (product) => {
 };
 
 const handleSubmit = () => {
-  alert(
-    `អរគុណសម្រាប់ការបញ្ជាទិញ ${selectedProduct.value.title}!\nយើងនឹងទាក់ទងទៅលេខ: ${formData.phone}`
-  );
-
-  // Reset and Close
+  alert(`អរគុណសម្រាប់ការបញ្ជាទិញ ${selectedProduct.value.title}!\nយើងនឹងទាក់ទងទៅលេខ: ${formData.phone}`);
   showModal.value = false;
   formData.phone = "";
   formData.location = "";

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../pages/Home.vue'
 import Iphone from '../pages/Iphone.vue'
-import Pixel from '../pages/Pixel.vue'
+import Pixel from '../pages/SecondHand.vue'
 import Samsung from '../pages/Samsung.vue'
 import Nokia from '../pages/Accesury.vue'
 
@@ -15,7 +15,7 @@ const routes = [
 		component: Iphone
 	},
 	{
-		path: '/pixel',
+		path: '/secondHand',
 		component: Pixel
 	},
 	{

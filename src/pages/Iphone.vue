@@ -4,14 +4,17 @@
       class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-200"
     >
       <div
-        class=" max-w-7xl mx-auto px-4 py-4 flex-col justify-center items-center"
+        class="max-w-7xl mx-auto px-4 py-4 flex flex-col justify-center items-center"
       >
-        <h1 class="text-3xl text-center font-bold tracking-tight text-blue-600">Apple Store</h1>
+        <h1 class="text-3xl text-center font-bold tracking-tight text-blue-600">
+          Apple Store
+        </h1>
+
         <p
-          v-if="!loading && iphones.length"
+          v-if="!loading && filteredIphones.length"
           class="text-center pt-2 text-xs font-bold text-gray-400 uppercase tracking-widest"
         >
-          {{ iphones.length }} Models
+          {{ filteredIphones.length }} Models Found
         </p>
       </div>
     </nav>
@@ -31,11 +34,11 @@
       </div>
 
       <div
-        v-else
+        v-else-if="filteredIphones.length > 0"
         class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8"
       >
         <div
-          v-for="product in iphones"
+          v-for="product in filteredIphones"
           :key="product.id"
           class="group bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all flex flex-col overflow-hidden"
         >
@@ -69,6 +72,14 @@
           </div>
         </div>
       </div>
+
+      <div v-else class="text-center py-20">
+        <div class="text-4xl mb-4">🔍</div>
+        <h3 class="text-lg font-bold text-gray-800">No matches found</h3>
+        <p class="text-gray-500">
+          We couldn't find any iPhone matching "{{ searchQuery }}"
+        </p>
+      </div>
     </main>
 
     <div
@@ -81,7 +92,7 @@
       >
         <button
           @click="closeDetails"
-          class="absolute top-4 right-4 text-gray-400"
+          class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
           ✕
         </button>
@@ -102,7 +113,7 @@
               Buy
             </button>
             <button
-              class="bg-blue-600 text-white px-6 py-2 rounded-full font-bold text-sm"
+              class="bg-gray-100 text-gray-900 px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-200"
             >
               Add
             </button>
@@ -114,19 +125,44 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed, defineProps } from "vue";
+
+// Accept the searchQuery from App.vue
+const props = defineProps({
+  searchQuery: {
+    type: String,
+    default: "",
+  },
+});
 
 const iphones = ref([]);
 const loading = ref(true);
 const error = ref(null);
 const selectedProduct = ref(null);
 
-// Fetch iPhones from API
+/**
+ * Filtered logic:
+ * This computed property automatically recalculates whenever
+ * iphones.value OR props.searchQuery changes.
+ */
+const filteredIphones = computed(() => {
+  if (!props.searchQuery) {
+    return iphones.value;
+  }
+  const query = props.searchQuery.toLowerCase().trim();
+  return iphones.value.filter((phone) => {
+    return (
+      phone.title.toLowerCase().includes(query) ||
+      phone.description.toLowerCase().includes(query)
+    );
+  });
+});
+
 const fetchIphones = async () => {
   try {
     loading.value = true;
     const response = await fetch(
-      "https://dummyjson.com/products/search?q=iPhone"
+      "https://dummyjson.com/products/search?q=iPhone",
     );
 
     if (!response.ok) throw new Error("Network response was not ok");
