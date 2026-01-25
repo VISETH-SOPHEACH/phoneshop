@@ -28,7 +28,6 @@
             >
               {{ brand.name }}
             </span>
-
             <span
               :class="[
                 'absolute -bottom-1 left-0 h-0.5 bg-linear-to-r from-blue-500 to-purple-500 transition-all duration-300',
@@ -39,20 +38,30 @@
         </div>
       </nav>
 
-      <div class="relative">
+      <div class="relative flex items-center">
         <button
           @click="toggleMobileSearch"
           class="md:hidden flex items-center justify-center w-10 h-10 rounded-full bg-white/60 backdrop-blur hover:bg-white/80 transition shadow-sm"
         >
-          🔍
+          <img :src="searchIcon" alt="search" class="fill-balck" />
         </button>
 
         <div class="hidden md:flex items-center relative">
-          <input
-            v-model="searchText" @input="search" type="text" placeholder="Search products..."
-            class="w-64 pl-10 pr-4 py-2 text-sm rounded-full border bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
           <span class="absolute left-3 text-gray-400">🔍</span>
+          <input
+            v-model="searchText"
+            @input="search"
+            type="text"
+            placeholder="Search products..."
+            class="w-64 pl-10 pr-10 py-2 text-sm rounded-full border bg-white/70 backdrop-blur focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button
+            v-if="searchText"
+            @click="clearSearch"
+            class="absolute right-3 text-gray-400 hover:text-gray-600 transition"
+          >
+            ✕
+          </button>
         </div>
 
         <transition
@@ -65,7 +74,7 @@
         >
           <div
             v-if="isSearchOpen"
-            class="fixed inset-0 z-100 bg-white/95 backdrop-blur-md flex flex-col px-4 pt-6"
+            class="fixed inset-0 z-100 bg-white/95 backdrop-blur-md flex flex-col px-4 pt-3"
           >
             <div class="flex items-center gap-3">
               <div class="relative flex-1">
@@ -74,8 +83,20 @@
                   >🔍</span
                 >
                 <input
-                  v-model="searchText" @input="search" type="text" placeholder="Search products..." class="w-full pl-11 pr-4 py-3 text-base rounded-2xl border-none bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-inner" autofocus
+                  v-model="searchText"
+                  @input="search"
+                  @keyup.enter="handleMobileSearch"
+                  type="text"
+                  placeholder="Search products..."
+                  class="w-full pl-11 pr-12 py-3 text-base rounded-2xl border-none bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-600 shadow-inner"
+                  autofocus
                 />
+                <button
+                  @click="isSearchOpen = false"
+                  class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-black text-xl font-bold"
+                >
+                  ✕
+                </button>
               </div>
 
               <button
@@ -84,13 +105,6 @@
               >
                 Search
               </button>
-            </div>
-
-            <div
-              v-if="searchText"
-              class="mt-4 px-2 text-sm text-gray-500 italic"
-            >
-              Showing results for: "{{ searchText }}"
             </div>
           </div>
         </transition>
@@ -131,7 +145,6 @@
             &times;
           </button>
         </div>
-
         <div class="p-6">
           <form @submit.prevent="handleSubmit" class="space-y-4">
             <div v-if="!isLoginView">
@@ -144,7 +157,6 @@
                 placeholder="John Doe"
               />
             </div>
-
             <div>
               <label class="block text-sm font-medium text-gray-700"
                 >Email Address</label
@@ -155,7 +167,6 @@
                 placeholder="you@example.com"
               />
             </div>
-
             <div>
               <label class="block text-sm font-medium text-gray-700"
                 >Password</label
@@ -166,7 +177,6 @@
                 placeholder="••••••••"
               />
             </div>
-
             <button
               type="submit"
               class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
@@ -174,7 +184,6 @@
               {{ isLoginView ? "Sign In" : "Register Now" }}
             </button>
           </form>
-
           <p class="mt-6 text-center text-sm text-gray-600">
             {{
               isLoginView
@@ -202,7 +211,7 @@
     >
       <nav
         v-if="isMenuOpen"
-        class="md:hidden absolute top-18.25 left-0 w-full bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-2xl z-40"
+        class="md:hidden absolute top-18 left-0 w-full bg-white/80 backdrop-blur-2xl border-b border-white/20 shadow-2xl z-40"
       >
         <div class="flex flex-col p-6 space-y-4">
           <router-link
@@ -211,18 +220,11 @@
             :to="brand.path"
             v-slot="{ isActive }"
             @click="isMenuOpen = false"
-            active-class="text-blue-600"
-            class="text-lg font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+            class="text-lg font-semibold transition-colors"
           >
-            <span
-              :class="
-                isActive
-                  ? 'text-red-600'
-                  : 'text-gray-700 group-hover:text-blue-600'
-              "
-            >
-              {{ brand.name }}
-            </span>
+            <span :class="isActive ? 'text-blue-600' : 'text-gray-700'">{{
+              brand.name
+            }}</span>
           </router-link>
           <div class="pt-4 border-t border-gray-200/50">
             <button
@@ -242,9 +244,12 @@
 </template>
 
 <script>
+import searchIcon from "../assets/image.png";
+
 export default {
   data() {
     return {
+      searchIcon,
       searchText: "",
       isMenuOpen: false,
       isSearchOpen: false,
@@ -255,7 +260,7 @@ export default {
         { name: "iPhone", path: "/iphone" },
         { name: "Samsung", path: "/samsung" },
         { name: "Second Hand", path: "/secondHand" },
-        { name: "Accesury", path: "/accesury" },
+        { name: "Accessory", path: "/accesury" },
       ],
     };
   },
@@ -268,6 +273,17 @@ export default {
     },
     search() {
       this.$emit("search-product", this.searchText);
+    },
+    // New logic for mobile search execution
+    handleMobileSearch() {
+      if (this.searchText.trim()) {
+        this.search();
+      }
+      this.isSearchOpen = false; // This makes the search input invisible/closed
+    },
+    clearSearch() {
+      this.searchText = "";
+      this.search();
     },
     handleSubmit() {
       const mode = this.isLoginView ? "Logging in" : "Registering";
