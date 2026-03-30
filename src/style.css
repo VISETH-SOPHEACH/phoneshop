@@ -1,1 +1,83 @@
+﻿@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Sora:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --bg: #f3f7ff;
+  --bg-elevated: rgba(255, 255, 255, 0.82);
+  --surface: #ffffff;
+  --surface-muted: #eef3ff;
+  --text: #111827;
+  --text-soft: #516079;
+  --border: #d8e2ff;
+  --brand: #2563eb;
+  --brand-soft: #dbeafe;
+  --ring: rgba(37, 99, 235, 0.22);
+}
+
+.dark {
+  --bg: #060a17;
+  --bg-elevated: rgba(17, 24, 39, 0.72);
+  --surface: #111827;
+  --surface-muted: #1f2937;
+  --text: #ecf3ff;
+  --text-soft: #9fb0ca;
+  --border: #233255;
+  --brand: #60a5fa;
+  --brand-soft: rgba(96, 165, 250, 0.2);
+  --ring: rgba(96, 165, 250, 0.3);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 10% 10%, rgba(37, 99, 235, 0.17), transparent 45%),
+    radial-gradient(circle at 90% 18%, rgba(14, 165, 233, 0.17), transparent 42%),
+    linear-gradient(160deg, var(--bg), color-mix(in srgb, var(--bg) 82%, #ffffff 18%));
+  background-attachment: fixed;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Sora", "Space Grotesk", sans-serif;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.glass-panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+
+.app-shell {
+  width: min(1400px, 100% - 1.5rem);
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    width: min(1400px, 100% - 2.5rem);
+  }
+}

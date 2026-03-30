@@ -1,320 +1,226 @@
-<template>
-  <div class="bg-linear-to-br from-blue-50 via-white to-purple-100">
-    <header
-      class="flex items-center justify-between px-4 sm:px-6 md:px-10 lg:px-16 py-3.5 md:py-4 bg-white/40 backdrop-blur-xl border-b border-white/30 shadow-sm sticky top-0 z-50"
-    >
-      <!-- Logo -->
-      <div class="text-xl sm:text-2xl font-extrabold tracking-tight">
-        <span class="text-blue-600 drop-shadow">PHONE</span>
-        <span class="text-gray-900">SHOP</span>
+﻿<template>
+  <header class="sticky top-3 z-50 px-2 sm:px-0">
+    <div class="glass-panel rounded-2xl shadow-lg shadow-blue-900/10">
+      <div class="flex items-center gap-3 px-3 sm:px-5 py-3.5">
+        <router-link to="/" class="shrink-0">
+          <h1 class="text-lg sm:text-xl font-extrabold tracking-tight">
+            <span class="text-blue-600 dark:text-blue-300">PHONE</span>
+            <span class="text-slate-900 dark:text-slate-100">SHOP</span>
+          </h1>
+        </router-link>
+
+        <nav class="hidden lg:flex items-center gap-6 ml-5">
+          <router-link v-for="item in brands" :key="item.path" :to="item.path" v-slot="{ isActive }">
+            <span
+              class="relative inline-flex text-sm font-semibold tracking-wide transition"
+              :class="isNavActive(item.path, isActive) ? 'text-blue-600 dark:text-blue-300' : 'text-slate-700 hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-300'"
+            >
+              {{ item.name }}
+              <span
+                class="absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 dark:bg-blue-300 transition-all duration-200"
+                :class="isNavActive(item.path, isActive) ? 'w-full' : 'w-0'"
+              ></span>
+            </span>
+          </router-link>
+        </nav>
+
+        <div class="ml-auto flex items-center gap-2 sm:gap-3">
+          <div class="hidden md:flex items-center relative">
+            <input
+              v-model="searchText"
+              @input="emitSearch"
+              type="text"
+              placeholder="Search products"
+              class="w-44 lg:w-64 pl-10 pr-9 py-2.5 rounded-xl border bg-white/80 border-blue-100 text-slate-900 placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-500/15 focus:border-blue-400 dark:bg-slate-900/80 dark:text-slate-100 dark:border-slate-700 dark:placeholder:text-slate-500"
+            />
+            <svg class="w-4 h-4 absolute left-3 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+            <button
+              v-if="searchText"
+              @click="clearSearch"
+              class="absolute right-3 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              aria-label="Clear"
+            >
+              x
+            </button>
+          </div>
+
+          <button
+            @click="toggleTheme"
+            class="h-10 px-3 sm:px-3.5 rounded-xl border border-blue-100 bg-white/85 text-slate-700 hover:bg-blue-50 transition flex items-center gap-1.5 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-200 dark:hover:bg-slate-800"
+            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+          >
+            <svg v-if="isDark" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="4" />
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+            </svg>
+            <svg v-else class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 3a7.5 7.5 0 1 0 9 9A9 9 0 1 1 12 3z" />
+            </svg>
+            <span class="hidden sm:inline text-xs font-semibold">
+              {{ isDark ? "Light" : "Dark" }}
+            </span>
+          </button>
+
+          <button
+            @click="toggleMobileSearch"
+            class="md:hidden h-10 w-10 rounded-xl border border-blue-100 bg-white/85 text-slate-700 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-200"
+            aria-label="Open search"
+          >
+            <svg class="w-5 h-5 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+          </button>
+
+          <button
+            @click="toggleMenu"
+            class="lg:hidden h-10 w-10 rounded-xl border border-blue-100 bg-white/85 text-slate-700 dark:border-slate-700 dark:bg-slate-900/85 dark:text-slate-200"
+            aria-label="Menu"
+          >
+            <span class="font-bold">{{ isMenuOpen ? 'x' : '=' }}</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-6 lg:gap-10">
-        <div
-          v-for="(brand, index) in brands"
-          :key="index"
-          class="group relative"
-        >
-          <router-link
-            :to="brand.path"
-            v-slot="{ isActive }"
-            class="text-sm lg:text-base font-semibold tracking-wide transition-colors duration-300"
-          >
-            <span
-              :class="[
-                isActive
-                  ? 'text-blue-600'
-                  : 'text-gray-800 group-hover:text-blue-600',
-              ]"
-            >
-              {{ brand.name }}
-            </span>
-            <span
-              :class="[
-                'absolute -bottom-1.5 left-0 h-0.5 bg-linear-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-300',
-                isActive ? 'w-full' : 'w-0 group-hover:w-full',
-              ]"
-            ></span>
-          </router-link>
-        </div>
-      </nav>
-
-      <!-- Search + Auth (desktop + mobile triggers) -->
-      <div class="flex items-center gap-3 sm:gap-4">
-        <!-- Mobile search trigger -->
-        <button
-          @click="toggleMobileSearch"
-          class="md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 backdrop-blur hover:bg-white/90 transition shadow-sm"
-        >
-          <img :src="searchIcon" alt="Search" class="w-5 h-5 fill-black" />
-        </button>
-
-        <!-- Desktop search -->
-        <div class="hidden md:flex items-center relative">
-          <span class="absolute left-3.5 text-gray-400 text-lg">🔍</span>
+      <div v-if="isSearchOpen" class="border-t border-blue-100/80 dark:border-slate-700 p-3 md:hidden">
+        <div class="relative">
           <input
             v-model="searchText"
-            @input="search"
+            @input="emitSearch"
             type="text"
-            placeholder="Search phones, accessories..."
-            class="w-56 sm:w-64 md:w-72 lg:w-80 pl-11 pr-10 py-2.5 text-sm rounded-full bg-white/80 backdrop-blur border border-gray-200/70 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-300/50 transition"
+            placeholder="Search products"
+            class="w-full rounded-xl border bg-white/80 border-blue-100 text-slate-900 placeholder:text-slate-400 pl-10 pr-10 py-2.5 outline-none focus:ring-4 focus:ring-blue-500/15 focus:border-blue-400 dark:bg-slate-900/80 dark:text-slate-100 dark:border-slate-700 dark:placeholder:text-slate-500"
           />
+          <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
           <button
             v-if="searchText"
             @click="clearSearch"
-            class="absolute right-3.5 text-gray-500 hover:text-gray-800 text-lg transition"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-slate-500"
           >
-            ✕
+            x
           </button>
         </div>
-
-        <!-- Auth button (visible on all sizes) -->
-        <button
-          @click="showAuthModal = true"
-          class="hidden sm:block px-4 py-2 text-sm font-semibold text-blue-700 bg-white/60 backdrop-blur-md border border-white/40 rounded-xl hover:bg-white/80 transition shadow-sm"
-        >
-          Log In
-        </button>
-
-        <!-- Hamburger -->
-        <button
-          @click="toggleMenu"
-          class="md:hidden flex items-center justify-center w-9 h-9 sm:w-10 sm:h-10 text-2xl text-gray-800 hover:bg-white/50 rounded-xl transition"
-        >
-          <span v-if="!isMenuOpen">☰</span>
-          <span v-else>✕</span>
-        </button>
       </div>
-    </header>
 
-    <!-- Mobile Full-screen Search Overlay -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 scale-95"
-      enter-to-class="opacity-100 scale-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-95"
-    >
-      <div
-        v-if="isSearchOpen"
-        class="fixed inset-0 z-50 bg-white/95 backdrop-blur-lg flex flex-col px-4 pt-4 md:hidden"
-      >
-        <div class="flex items-center gap-3 max-w-3xl mx-auto w-full">
-          <div class="relative flex-1">
+      <!-- <nav class="lg:hidden border-t border-blue-100/80 dark:border-slate-700 px-3 py-2.5 flex items-center gap-4 overflow-x-auto">
+        <router-link v-for="item in brands" :key="`mobile-${item.path}`" :to="item.path" v-slot="{ isActive }">
+          <span
+            class="relative inline-flex whitespace-nowrap text-sm font-semibold pb-1 transition"
+            :class="isNavActive(item.path, isActive) ? 'text-blue-600 dark:text-blue-300' : 'text-slate-700 dark:text-slate-200'"
+          >
+            {{ item.name }}
             <span
-              class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 text-xl"
-              >🔍</span
-            >
-            <input
-              v-model="searchText"
-              @input="search"
-              @keyup.enter="handleMobileSearch"
-              type="text"
-              placeholder="Search phones, accessories..."
-              class="w-full pl-12 pr-14 py-3.5 text-base rounded-2xl bg-gray-100/80 border-none focus:ring-2 focus:ring-blue-500 shadow-inner outline-none"
-              autofocus
-            />
-            <button
-              @click="isSearchOpen = false"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-black text-2xl font-bold"
-            >
-              ✕
-            </button>
-          </div>
-          <button
-            @click="handleMobileSearch"
-            class="bg-blue-600 text-white px-6 py-3 rounded-2xl font-semibold shadow active:bg-blue-700 transition"
-          >
-            Go
-          </button>
-        </div>
-      </div>
-    </transition>
+              class="absolute bottom-0 left-0 h-0.5 rounded-full bg-blue-600 dark:bg-blue-300 transition-all duration-200"
+              :class="isNavActive(item.path, isActive) ? 'w-full' : 'w-0'"
+            ></span>
+          </span>
+        </router-link>
+      </nav> -->
 
-    <!-- Mobile Menu -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 -translate-y-4"
-      enter-to-class="opacity-100 translate-y-0"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 -translate-y-4"
-    >
       <nav
         v-if="isMenuOpen"
-        class="md:hidden fixed inset-x-0 top-16 z-40 bg-white/90 backdrop-blur-2xl border-b border-gray-200/30 shadow-xl"
+        class="lg:hidden border-t border-blue-100/80 dark:border-slate-700 px-4 py-4 space-y-2"
       >
-        <div
-          class="flex flex-col px-5 sm:px-8 py-6 space-y-5 max-w-3xl mx-auto"
-        >
-          <router-link
-            v-for="(brand, index) in brands"
-            :key="index"
-            :to="brand.path"
+        <router-link v-for="item in brands" :key="item.path" :to="item.path" v-slot="{ isActive }">
+          <span
             @click="isMenuOpen = false"
-            class="text-lg font-medium text-gray-800 hover:text-blue-600 transition"
+            class="block px-3 py-2.5 rounded-xl text-sm font-semibold transition"
+            :class="isNavActive(item.path, isActive) ? 'text-blue-600 bg-blue-50 dark:text-blue-300 dark:bg-slate-800' : 'text-slate-700 hover:bg-blue-50 dark:text-slate-200 dark:hover:bg-slate-800'"
           >
-            {{ brand.name }}
-          </router-link>
-
-          <div class="pt-4 border-t border-gray-200/50">
-            <button
-              @click="
-                isMenuOpen = false;
-                showAuthModal = true;
-              "
-              class="text-blue-600 font-semibold text-lg"
-            >
-              Log In / Register
-            </button>
-          </div>
-        </div>
+            <span class="relative inline-block">
+              {{ item.name }}
+              <span
+                class="absolute -bottom-1 left-0 h-0.5 rounded-full bg-blue-600 dark:bg-blue-300 transition-all duration-200"
+                :class="isNavActive(item.path, isActive) ? 'w-full' : 'w-0'"
+              ></span>
+            </span>
+          </span>
+        </router-link>
       </nav>
-    </transition>
-
-    <!-- Auth Modal -->
-    <transition
-      enter-active-class="transition duration-300 ease-out"
-      enter-from-class="opacity-0 scale-95"
-      enter-to-class="opacity-100 scale-100"
-      leave-active-class="transition duration-200 ease-in"
-      leave-from-class="opacity-100 scale-100"
-      leave-to-class="opacity-0 scale-95"
-    >
-      <div
-        v-if="showAuthModal"
-        class="fixed inset-0 z-60 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4"
-      >
-        <div
-          class="bg-white rounded-2xl shadow-2xl w-full max-w-md sm:max-w-lg overflow-hidden animate-in fade-in zoom-in duration-300"
-        >
-          <div class="flex justify-between items-center px-6 py-5 border-b">
-            <h2 class="text-xl sm:text-2xl font-bold text-gray-800">
-              {{ isLoginView ? "Welcome Back" : "Join Us" }}
-            </h2>
-            <button
-              @click="showAuthModal = false"
-              class="text-gray-500 hover:text-gray-800 text-3xl leading-none"
-            >
-              ×
-            </button>
-          </div>
-
-          <div class="p-6 sm:p-8">
-            <form @submit.prevent="handleSubmit" class="space-y-5">
-              <div v-if="!isLoginView">
-                <label class="block text-sm font-medium text-gray-700 mb-1.5"
-                  >Full Name</label
-                >
-                <input
-                  type="text"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
-                  placeholder="John Doe"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5"
-                  >Email</label
-                >
-                <input
-                  type="email"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
-                  placeholder="you@example.com"
-                />
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1.5"
-                  >Password</label
-                >
-                <input
-                  type="password"
-                  class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-400 focus:border-blue-400 outline-none transition"
-                  placeholder="••••••••"
-                />
-              </div>
-              <button
-                type="submit"
-                class="w-full py-3.5 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition shadow-md"
-              >
-                {{ isLoginView ? "Sign In" : "Create Account" }}
-              </button>
-            </form>
-
-            <p class="mt-6 text-center text-sm text-gray-600">
-              {{ isLoginView ? "New here?" : "Already have an account?" }}
-              <button
-                @click="isLoginView = !isLoginView"
-                class="text-blue-600 font-semibold hover:underline ml-1"
-              >
-                {{ isLoginView ? "Create account" : "Sign in" }}
-              </button>
-            </p>
-          </div>
-        </div>
-      </div>
-    </transition>
-  </div>
+    </div>
+  </header>
 </template>
 
-<script>
-import searchIcon from "../assets/image.png";
+<script setup>
+import { onMounted, onUnmounted, ref, watch } from "vue";
+import { useRoute } from "vue-router";
 
-export default {
-  data() {
-    return {
-      searchIcon,
-      searchText: "",
-      isMenuOpen: false,
-      isSearchOpen: false,
-      showAuthModal: false,
-      isLoginView: true,
-      brands: [
-        { name: "Home", path: "/" },
-        { name: "iPhone", path: "/iphone" },
-        { name: "Samsung", path: "/samsung" },
-        { name: "Second Hand", path: "/secondHand" },
-        { name: "Accessory", path: "/accessory" }, // ← fixed typo
-      ],
-    };
-  },
-  methods: {
-    toggleMobileSearch() {
-      this.isSearchOpen = !this.isSearchOpen;
-      if (this.isSearchOpen) this.isMenuOpen = false;
-    },
-    toggleMenu() {
-      this.isMenuOpen = !this.isMenuOpen;
-      if (this.isMenuOpen) this.isSearchOpen = false;
-    },
-    search() {
-      this.$emit("search-product", this.searchText.trim());
-    },
-    handleMobileSearch() {
-      if (this.searchText.trim()) {
-        this.search();
-      }
-      this.isSearchOpen = false;
-    },
-    clearSearch() {
-      this.searchText = "";
-      this.search();
-    },
-    handleSubmit() {
-      alert(this.isLoginView ? "Logging in..." : "Registering...");
-      this.showAuthModal = false;
-      // → call real auth API here
-    },
-  },
+const emit = defineEmits(["search-product"]);
+const route = useRoute();
+
+const searchText = ref("");
+const isMenuOpen = ref(false);
+const isSearchOpen = ref(false);
+const isDark = ref(false);
+const activeHomeSectionPath = ref("/");
+
+const brands = [
+  { name: "Home", path: "/" },
+  { name: "iPhone", path: "/iphone" },
+  { name: "Samsung", path: "/samsung" },
+  { name: "Second Hand", path: "/secondHand" },
+  { name: "Accessory", path: "/accessory" },
+];
+
+const applyTheme = (darkEnabled) => {
+  document.documentElement.classList.toggle("dark", darkEnabled);
+  isDark.value = darkEnabled;
 };
-</script>
 
-<style>
-/* Optional: extra smooth backdrop blur support on older browsers */
-@supports not (backdrop-filter: blur(12px)) {
-  .backdrop-blur-xl {
-    background-color: rgba(255, 255, 255, 0.75);
+const toggleTheme = () => {
+  const next = !isDark.value;
+  applyTheme(next);
+  localStorage.setItem("phoneshop-theme", next ? "dark" : "light");
+};
+
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+  if (isMenuOpen.value) isSearchOpen.value = false;
+};
+
+const toggleMobileSearch = () => {
+  isSearchOpen.value = !isSearchOpen.value;
+  if (isSearchOpen.value) isMenuOpen.value = false;
+};
+
+const emitSearch = () => emit("search-product", searchText.value.trim());
+
+const clearSearch = () => {
+  searchText.value = "";
+  emitSearch();
+};
+
+const handleHomeSectionActive = (event) => {
+  const nextPath = event.detail?.path;
+  if (route.path === "/" && typeof nextPath === "string") {
+    activeHomeSectionPath.value = nextPath;
   }
-}
-</style>
+};
+
+const isNavActive = (path, routeIsActive) => {
+  if (route.path === "/") {
+    return activeHomeSectionPath.value === path;
+  }
+  return routeIsActive;
+};
+
+onMounted(() => {
+  const saved = localStorage.getItem("phoneshop-theme");
+  const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  applyTheme(saved ? saved === "dark" : prefersDark);
+  window.addEventListener("home-section-active", handleHomeSectionActive);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("home-section-active", handleHomeSectionActive);
+});
+
+watch(
+  () => route.path,
+  (nextPath) => {
+    if (nextPath !== "/") {
+      activeHomeSectionPath.value = nextPath;
+    } else {
+      activeHomeSectionPath.value = "/";
+    }
+  },
+  { immediate: true },
+);
+</script>

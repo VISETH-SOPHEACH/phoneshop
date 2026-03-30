@@ -1,193 +1,94 @@
-<template>
-  <div class="min-h-screen bg-linear-to-br from-gray-50 via-white to-gray-100">
-    <div class="max-w-7xl mx-auto px-6">
-      <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md">
-        <div
-          class="max-w-7xl mx-auto px-6 py-5 flex flex-col justify-center items-center"
-        >
-          <h1
-            class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
-          >
-            Second <span class="text-gray-400 font-light">Hand</span>
-          </h1>
-          <p
-            v-if="!loading && filteredPixels.length"
-            class="text-gray-500 text-lg pt-2"
-          >
-            {{ filteredPixels.length }} models available
-          </p>
-        </div>
-      </nav>
-
-      <div v-if="loading" class="flex flex-col items-center py-20">
-        <div
-          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
-        ></div>
-        <p class="text-gray-500 text-lg">ទាញយកទិន្នន័យពី API</p>
+﻿<template>
+  <section class="glass-panel rounded-3xl p-4 sm:p-6 lg:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300 font-semibold">Certified</p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">Second Hand</h2>
       </div>
+      <p v-if="!loading && filteredPixels.length" class="text-sm text-slate-500 dark:text-slate-400">{{ filteredPixels.length }} models available</p>
+    </div>
 
-      <div v-else-if="error" class="text-center py-20">
-        <p class="text-red-500 text-xl font-semibold">{{ error }}</p>
-      </div>
+    <div v-if="loading" class="py-20 flex flex-col items-center">
+      <div class="w-11 h-11 border-4 border-blue-100 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-300 rounded-full animate-spin"></div>
+      <p class="mt-3 text-slate-500 dark:text-slate-400">Loading products...</p>
+    </div>
 
-      <div
-        v-else-if="filteredPixels.length > 0"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+    <p v-else-if="error" class="py-16 text-center text-red-500">{{ error }}</p>
+
+    <div v-else-if="filteredPixels.length" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <article
+        v-for="product in filteredPixels"
+        :key="product.id"
+        class="rounded-2xl border border-blue-100 bg-white/85 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 dark:bg-slate-900/75 dark:border-slate-700"
       >
-        <div
-          v-for="product in filteredPixels"
-          :key="product.id"
-          class="group rounded-3xl bg-white/70 backdrop-blur-lg border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
-        >
-          <div
-            class="h-60 flex items-center justify-center bg-linear-to-b from-gray-50 to-white"
-          >
-            <img
-              :src="product.thumbnail"
-              :alt="product.title"
-              class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-110"
-            />
-          </div>
+        <div class="h-44 sm:h-52 flex items-center justify-center bg-slate-50 dark:bg-slate-800/80 p-4">
+          <img :src="product.thumbnail" :alt="product.title" class="max-h-full object-contain transition-transform duration-300 hover:scale-105" />
+        </div>
 
-          <div class="p-6 flex flex-col grow">
-            <h3 class="text-xl font-semibold text-gray-900 mb-2">
-              {{ product.title }}
-            </h3>
-            <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">
-              {{ product.description }}
-            </p>
-            <div class="mt-auto flex items-center justify-between">
-              <span class="text-2xl font-bold text-gray-900"
-                >${{ product.price }}</span
-              >
-              <button
-                @click="openDetails(product)"
-                class="px-5 py-2.5 rounded-full bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
-              >
-                View Details
-              </button>
-            </div>
+        <div class="p-4 sm:p-5 flex flex-col min-h-48">
+          <h3 class="font-bold text-base sm:text-lg text-slate-900 dark:text-slate-100 line-clamp-1">{{ product.title }}</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{{ product.description }}</p>
+
+          <div class="mt-auto pt-4 flex items-center justify-between">
+            <span class="text-xl font-extrabold text-slate-900 dark:text-slate-100">${{ product.price }}</span>
+            <button @click="openDetails(product)" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold transition">Details</button>
           </div>
         </div>
-      </div>
+      </article>
+    </div>
 
-      <div v-else class="text-center py-20">
-        <div class="text-4xl mb-4">🔎</div>
-        <h3 class="text-lg font-bold text-gray-800">រកមិនឃើញទិន្នន័យទេ</h3>
-        <p class="text-gray-500">
-          No second hand phones match "{{ searchQuery }}"
-        </p>
-      </div>
+    <div v-else class="text-center py-14">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">No matches found</h3>
+      <p class="mt-1 text-slate-500 dark:text-slate-400">No second-hand phones match "{{ searchQuery }}"</p>
+    </div>
 
-      <div
-        v-if="selectedProduct"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-        @click.self="closeModal"
-      >
-        <div
-          class="bg-white rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden relative animate-in zoom-in duration-200"
-        >
-          <button
-            @click="closeModal"
-            class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl z-10"
-          >
-            &times;
-          </button>
+    <div
+      v-if="selectedProduct"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm"
+      @click.self="closeModal"
+    >
+      <div class="w-full max-w-lg rounded-3xl border border-blue-100 bg-white shadow-2xl dark:bg-slate-900 dark:border-slate-700">
+        <div class="p-6 sm:p-8">
+          <button @click="closeModal" class="ml-auto block text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">x</button>
 
-          <div v-if="modalStep === 'details'" class="p-8">
-            <div class="flex flex-col items-center">
-              <img
-                :src="selectedProduct.thumbnail"
-                class="h-48 object-contain mb-6"
-              />
-              <h2 class="text-3xl font-bold text-gray-900 mb-2">
-                {{ selectedProduct.title }}
-              </h2>
-              <p class="text-blue-600 text-2xl font-bold mb-4">
-                ${{ selectedProduct.price }}
-              </p>
-              <div class="text-gray-600 space-y-2 text-center mb-8">
-                <p><strong>Brand:</strong> {{ selectedProduct.brand }}</p>
-                <p><strong>Category:</strong> {{ selectedProduct.category }}</p>
-                <p>{{ selectedProduct.description }}</p>
-              </div>
-              <button
-                @click="modalStep = 'form'"
-                class="w-full py-4 bg-green-600 text-white font-bold rounded-2xl hover:bg-green-700 transition-colors shadow-lg"
-              >
-                Buy This Phone
-              </button>
-            </div>
+          <div v-if="modalStep === 'details'" class="text-center">
+            <img :src="selectedProduct.thumbnail" class="h-44 mx-auto object-contain" />
+            <h3 class="mt-4 text-2xl font-bold text-slate-900 dark:text-slate-100">{{ selectedProduct.title }}</h3>
+            <p class="mt-2 text-2xl font-extrabold text-blue-600 dark:text-blue-300">${{ selectedProduct.price }}</p>
+            <p class="mt-3 text-sm text-slate-600 dark:text-slate-300">{{ selectedProduct.description }}</p>
+            <button @click="modalStep = 'form'" class="mt-6 w-full py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">Buy This Phone</button>
           </div>
 
-          <div v-else-if="modalStep === 'form'" class="p-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">
-              Complete Your Order
-            </h2>
-            <form @submit.prevent="submitOrder" class="space-y-4">
+          <div v-else>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Complete Your Order</h3>
+            <form @submit.prevent="submitOrder" class="mt-5 space-y-4">
               <div>
-                <label class="block text-sm font-medium text-gray-700"
-                  >Delivery Location</label
-                >
-                <input
-                  v-model="orderForm.location"
-                  required
-                  type="text"
-                  placeholder="Street address, City"
-                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                />
+                <label class="text-sm text-slate-700 dark:text-slate-300">Delivery Location</label>
+                <input v-model="orderForm.location" required type="text" placeholder="Street address, City" class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700"
-                  >Phone Number</label
-                >
-                <input
-                  v-model="orderForm.phone"
-                  required
-                  type="tel"
-                  placeholder="+1 (555) 000-0000"
-                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-                />
+                <label class="text-sm text-slate-700 dark:text-slate-300">Phone Number</label>
+                <input v-model="orderForm.phone" required type="tel" placeholder="+1 (555) 000-0000" class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700"
-                  >Feedback / Notes</label
-                >
-                <textarea
-                  v-model="orderForm.feedback"
-                  rows="3"
-                  placeholder="Any special instructions?"
-                  class="w-full mt-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                ></textarea>
+                <label class="text-sm text-slate-700 dark:text-slate-300">Feedback / Notes</label>
+                <textarea v-model="orderForm.feedback" rows="3" placeholder="Any special instructions?" class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 resize-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"></textarea>
               </div>
-
-              <div class="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  @click="modalStep = 'details'"
-                  class="flex-1 py-4 bg-gray-100 text-gray-700 font-bold rounded-2xl hover:bg-gray-200 transition"
-                >
-                  Back
-                </button>
-                <button
-                  type="submit"
-                  class="flex-2 py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-lg"
-                >
-                  Confirm Purchase
-                </button>
+              <div class="flex gap-3 pt-2">
+                <button type="button" @click="modalStep = 'details'" class="flex-1 py-3 rounded-xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-100">Back</button>
+                <button type="submit" class="flex-1 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Confirm</button>
               </div>
             </form>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, computed, defineProps } from "vue";
 
-// accept the search query prop
 const props = defineProps({
   searchQuery: {
     type: String,
@@ -198,8 +99,6 @@ const props = defineProps({
 const pixels = ref([]);
 const loading = ref(true);
 const error = ref(null);
-
-// modal State
 const selectedProduct = ref(null);
 const modalStep = ref("details");
 const orderForm = reactive({
@@ -208,7 +107,6 @@ const orderForm = reactive({
   feedback: "",
 });
 
-// filter logic for the list
 const filteredPixels = computed(() => {
   if (!props.searchQuery) return pixels.value;
   const query = props.searchQuery.toLowerCase().trim();
@@ -250,7 +148,7 @@ const closeModal = () => {
 
 const submitOrder = () => {
   alert(
-    `Order Confirmed for ${selectedProduct.value.title}!\nDelivering to: ${orderForm.location}`,
+    `Order confirmed for ${selectedProduct.value.title}. Delivering to: ${orderForm.location}`,
   );
   closeModal();
 };

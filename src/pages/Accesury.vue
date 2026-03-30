@@ -1,166 +1,89 @@
-<template>
-  <div class="min-h-screen bg-gray-50">
-    <nav class="sticky top-0 z-10 bg-gray-50/80 backdrop-blur-md border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-6 py-5 flex flex-col justify-center items-center">
-        <h1
-          class="text-3xl text-center font-extrabold tracking-tight text-blue-600"
-        >
-          Accesury <span class="text-gray-400 font-light">Store</span>
-        </h1>
-        <p v-if="!loading && filteredSamsung.length" class="text-center pt-2 text-xs font-bold text-gray-400 uppercase tracking-widest">
-          {{ filteredSamsung.length }} Items Found
-        </p>
+﻿<template>
+  <section class="glass-panel rounded-3xl p-4 sm:p-6 lg:p-8">
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2 mb-6">
+      <div>
+        <p class="text-xs uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300 font-semibold">Gear Up</p>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-slate-100">Accessory Store</h2>
       </div>
-    </nav>
+      <p v-if="!loading && filteredSamsung.length" class="text-sm text-slate-500 dark:text-slate-400">{{ filteredSamsung.length }} items found</p>
+    </div>
 
-    <main class="max-w-7xl mx-auto px-6 py-14">
-      <div v-if="loading" class="flex flex-col items-center py-24">
-        <div
-          class="w-12 h-12 border-4 border-gray-200 border-t-blue-600 rounded-full animate-spin mb-6"
-        ></div>
-        <p class="text-gray-500 text-lg">
-          API កំពុងបែកវ៉ល់ហើយ កុំប្រញ៉ាប់ពេក...
-        </p>
-      </div>
+    <div v-if="loading" class="py-20 flex flex-col items-center">
+      <div class="w-11 h-11 border-4 border-blue-100 border-t-blue-600 dark:border-slate-700 dark:border-t-blue-300 rounded-full animate-spin"></div>
+      <p class="mt-3 text-slate-500 dark:text-slate-400">Loading accessories...</p>
+    </div>
 
-      <div v-else-if="error" class="text-center py-24">
-        <p class="text-red-500 text-xl font-semibold">{{ error }}</p>
-      </div>
+    <p v-else-if="error" class="py-16 text-center text-red-500">{{ error }}</p>
 
-      <div
-        v-else-if="filteredSamsung.length > 0"
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-10"
+    <div v-else-if="filteredSamsung.length" class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+      <article
+        v-for="item in filteredSamsung"
+        :key="item.id"
+        class="rounded-2xl border border-blue-100 bg-white/85 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 dark:bg-slate-900/75 dark:border-slate-700"
       >
-        <div
-          v-for="item in filteredSamsung"
-          :key="item.id"
-          class="group rounded-3xl bg-white border border-gray-200 shadow-sm hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
-        >
-          <div class="h-60 flex items-center justify-center bg-gray-50">
-            <img
-              :src="item.thumbnail"
-              :alt="item.title"
-              class="max-h-52 object-contain transition-transform duration-300 group-hover:scale-110"
-            />
-          </div>
+        <div class="h-44 sm:h-52 flex items-center justify-center bg-slate-50 dark:bg-slate-800/80 p-4">
+          <img :src="item.thumbnail" :alt="item.title" class="max-h-full object-contain transition-transform duration-300 hover:scale-105" />
+        </div>
 
-          <div class="p-6 flex flex-col grow">
-            <p
-              class="text-xs font-semibold text-blue-500 uppercase tracking-widest mb-1"
-            >
-              {{ item.brand }}
-            </p>
-            <h2 class="text-xl font-semibold text-gray-900 mb-2 line-clamp-1">
-              {{ item.title }}
-            </h2>
-            <p class="text-sm text-gray-500 leading-relaxed mb-4 line-clamp-3">
-              {{ item.description }}
-            </p>
+        <div class="p-4 sm:p-5 flex flex-col min-h-48">
+          <p class="text-xs font-semibold text-blue-600 dark:text-blue-300 uppercase tracking-wider">{{ item.brand }}</p>
+          <h3 class="mt-1 text-base sm:text-lg font-bold text-slate-900 dark:text-slate-100 line-clamp-1">{{ item.title }}</h3>
+          <p class="mt-2 text-sm text-slate-500 dark:text-slate-400 line-clamp-3">{{ item.description }}</p>
 
-            <div class="mt-auto flex items-center justify-between">
-              <span class="text-2xl font-bold text-gray-900"
-                >${{ item.price }}</span
-              >
-              <button
-                @click="selectedProduct = item"
-                class="px-5 py-2.5 rounded-full bg-black text-white text-sm font-semibold hover:opacity-80 transition"
-              >
-                Buy Now
-              </button>
-            </div>
+          <div class="mt-auto pt-4 flex items-center justify-between">
+            <span class="text-xl font-extrabold text-slate-900 dark:text-slate-100">${{ item.price }}</span>
+            <button @click="selectedProduct = item" class="px-4 py-2 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-blue-600 dark:bg-blue-500 dark:hover:bg-blue-400 transition">Buy</button>
           </div>
         </div>
-      </div>
+      </article>
+    </div>
 
-      <div v-else class="text-center py-20">
-        <div class="text-4xl mb-4">📦</div>
-        <h3 class="text-lg font-bold text-gray-800">រកមិនឃើញគ្រឿងបន្លាស់ទេ</h3>
-        <p class="text-gray-500">No accessories match "{{ searchQuery }}"</p>
-      </div>
-    </main>
+    <div v-else class="text-center py-14">
+      <h3 class="text-lg font-bold text-slate-900 dark:text-slate-100">No matches found</h3>
+      <p class="mt-1 text-slate-500 dark:text-slate-400">No accessories match "{{ searchQuery }}"</p>
+    </div>
 
-    <div
-      v-if="selectedProduct"
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-      @click.self="selectedProduct = null"
-    >
-      <div
-        class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in duration-200"
-      >
-        <div class="p-8">
-          <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold text-gray-900">Checkout</h2>
-            <button
-              @click="selectedProduct = null"
-              class="text-gray-400 hover:text-gray-900 text-2xl"
-            >
-              &times;
-            </button>
-          </div>
-
-          <div class="flex items-center gap-4 p-3 bg-gray-50 rounded-2xl mb-6">
-            <img
-              :src="selectedProduct.thumbnail"
-              class="w-16 h-16 object-contain"
-            />
-            <div>
-              <p class="font-bold text-gray-800">{{ selectedProduct.title }}</p>
-              <p class="text-blue-600 font-bold">
-                ${{ selectedProduct.price }}
-              </p>
-            </div>
-          </div>
-
-          <form @submit.prevent="handlePurchase" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Location</label>
-              <input
-                v-model="form.location"
-                required
-                type="text"
-                placeholder="House #, Street, City"
-                class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Phone Number</label>
-              <input
-                v-model="form.phone"
-                required
-                type="tel"
-                placeholder="012 345 678"
-                class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700">Feedback</label>
-              <textarea
-                v-model="form.feedback"
-                rows="3"
-                placeholder="Tell us what you think..."
-                class="w-full mt-1 px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-              ></textarea>
-            </div>
-
-            <button
-              type="submit"
-              class="w-full py-4 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition shadow-lg shadow-blue-200"
-            >
-              Confirm Order
-            </button>
-          </form>
+    <div v-if="selectedProduct" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/55 backdrop-blur-sm" @click.self="selectedProduct = null">
+      <div class="w-full max-w-md rounded-3xl border border-blue-100 bg-white p-6 sm:p-7 shadow-2xl dark:bg-slate-900 dark:border-slate-700">
+        <div class="flex items-center justify-between mb-5">
+          <h3 class="text-xl font-bold text-slate-900 dark:text-slate-100">Checkout</h3>
+          <button @click="selectedProduct = null" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-100">x</button>
         </div>
+
+        <div class="flex items-center gap-4 p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/80 mb-5">
+          <img :src="selectedProduct.thumbnail" class="w-14 h-14 object-contain" />
+          <div>
+            <p class="font-bold text-slate-900 dark:text-slate-100 line-clamp-1">{{ selectedProduct.title }}</p>
+            <p class="text-blue-600 dark:text-blue-300 font-bold">${{ selectedProduct.price }}</p>
+          </div>
+        </div>
+
+        <form @submit.prevent="handlePurchase" class="space-y-4">
+          <div>
+            <label class="text-sm text-slate-700 dark:text-slate-300">Location</label>
+            <input v-model="form.location" required type="text" placeholder="House #, Street, City" class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-700 dark:text-slate-300">Phone Number</label>
+            <input v-model="form.phone" required type="tel" placeholder="012 345 678" class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          </div>
+
+          <div>
+            <label class="text-sm text-slate-700 dark:text-slate-300">Feedback</label>
+            <textarea v-model="form.feedback" rows="3" placeholder="Tell us what you think..." class="mt-1 w-full px-4 py-3 rounded-xl border border-blue-100 bg-white text-slate-900 outline-none focus:ring-4 focus:ring-blue-500/15 resize-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100"></textarea>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold">Confirm Order</button>
+        </form>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup>
 import { ref, onMounted, reactive, computed, defineProps } from "vue";
 
-// Accept searchQuery from parent
 const props = defineProps({
   searchQuery: {
     type: String,
@@ -172,14 +95,13 @@ const samsung = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
-// Form & Modal State
 const selectedProduct = ref(null);
 const form = reactive({
   location: "",
   phone: "",
   feedback: "",
 });
-  //filter products by name or description
+
 const filteredSamsung = computed(() => {
   if (!props.searchQuery) return samsung.value;
   const query = props.searchQuery.toLowerCase().trim();
@@ -197,11 +119,11 @@ const fetchSamsung = async () => {
     const response = await fetch(
       "https://dummyjson.com/products/search?q=phone"
     );
-    if (!response.ok) throw new Error("បែកវ៉ល់ API ហើយ");
+    if (!response.ok) throw new Error("API request failed");
     const data = await response.json();
     samsung.value = data.products;
   } catch (err) {
-    error.value = "វីវរ API ហើយ";
+    error.value = "Failed to load accessories.";
   } finally {
     loading.value = false;
   }
@@ -209,10 +131,9 @@ const fetchSamsung = async () => {
 
 const handlePurchase = () => {
   alert(
-    `អរគុណច្រើន! Order for ${selectedProduct.value.title} is placed.\nLocation: ${form.location}`
+    `Thanks! Order for ${selectedProduct.value.title} has been placed. Location: ${form.location}`
   );
 
-  // Clear and close
   selectedProduct.value = null;
   form.location = "";
   form.phone = "";
